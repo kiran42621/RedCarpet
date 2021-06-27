@@ -1,0 +1,79 @@
+{% extends "baselayout.html" %}
+{% block title %}Red Carpet {% endblock %}
+
+{% block body %}
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        {% for msg in messages %}
+            <p>{{msg}}</p>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+    <div class="container-fluid my-3">
+        <div class="row">
+            <div class="col-md-7 border-end border-4 border-primary">
+                <div class="container-fluid">
+                    <div>
+                        <div id="carouselExampleSlidesOnly" class="carousel slide" data-bs-ride="carousel">
+                            <div class="carousel-inner">
+                              <div class="carousel-item active">
+                                <img src="static//images/4.png" class="d-block w-100" alt="...">
+                              </div>
+                              <div class="carousel-item">
+                                <img src="static//images/5.png" class="d-block w-100" alt="...">
+                              </div>
+                              <div class="carousel-item">
+                                <img src="static//images/4.png" class="d-block w-100" alt="...">
+                              </div>
+                            </div>
+                          </div>
+                    </div>
+                    <p>
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. In tellus ante, molestie in eros vel, accumsan iaculis dolor. Integer sagittis sapien ac feugiat laoreet. Etiam viverra, est eu tincidunt consectetur, eros diam lobortis nunc, ac placerat arcu elit sed nibh. Cras vestibulum in turpis sit amet feugiat. Quisque in est congue, vulputate ligula sed, facilisis justo. Donec pretium dolor non arcu molestie laoreet. Etiam eu pellentesque velit, a pellentesque ligula.  
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-5">
+                <form action="/" method="POST">
+                    {{ form.csrf_token }}
+                 <div class="container-fluid border my-5 py-3">
+                    <center>
+                        <h3 style="font-family: serif;">Login</h3>
+                    </center>
+                    <div class="col mb-3">
+                        <label for="" class="form-label">Enter Email</label>
+                        {{ form.Email(class_="form-control") }}
+                        {% for errors in form.Email.errors %}
+                            <p style="font-family:serif;color:red">
+                                {{ errors }}
+                            </p>
+                        {% endfor %}
+                    </div>
+                    <div class="col mb-3">
+                        <label for="" class="form-label">Enter Password</label>
+                        {{ form.Password(class_="form-control") }}
+                        {% for errors in form.Password.errors %}
+                            <p style="font-family:serif;color:red">
+                                {{ errors }}
+                            </p>
+                        {% endfor %}
+                    </div>
+                    <div class="col mb-3">
+                        <label for="" class="form-label">User Type</label>
+                        {{ form.UserType(class_="form-control") }}
+                        {% for errors in form.UserType.errors %}
+                            <p style="font-family:serif;color:red">
+                                {{ errors }}
+                            </p>
+                        {% endfor %}
+                    </div>
+                    <div class="col mb-3">
+                        <a href="/ren_Register">Click Here</a>
+                        <input type="submit" value="Login" class="btn btn-primary">
+                    </div>
+                </div>
+            </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

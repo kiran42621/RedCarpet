@@ -1,0 +1,42 @@
+{% extends "layout.html" %}
+{% block title %}Red Carpet {% endblock %}
+
+{% block body %}
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        {% for msg in messages %}
+            <p>{{msg}}</p>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+    <div class="container-fluid">
+        <table class="table table-responsive table-hover table-striped" id="myTable">
+            <thead>
+                <tr>
+                    <th scope="col">Sl.no</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">Address</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for rows in data %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td><a href="/agent/AgentViewCustomer/{{rows._id}}">{{ rows.Name }}</a></td>
+                    <td>{{ rows.Email }}</td>
+                    <td>{{ rows.Address }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
+
+{% block jscript %}
+<script >
+  $(document).ready( function () {
+      $('#myTable').DataTable();
+    } );
+</script> 
+{% endblock jscript %}

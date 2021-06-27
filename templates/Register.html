@@ -1,0 +1,97 @@
+{% extends "baselayout.html" %}
+{% block title %}Red Carpet {% endblock %}
+
+{% block body %}
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        {% for msg in messages %}
+            <p>{{msg}}</p>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+<div class="container-fluid">
+    <div class="row">
+    <div class="col-md border-end border-4 border-primary">
+        <form action="/" method="POST">
+            {{ form.csrf_token }}
+         <div class="container-fluid border my-5 py-3">
+            <center>
+                <h3 style="font-family: serif;">Login</h3>
+            </center>
+            <div class="col mb-3">
+                <label for="" class="form-label">Enter Email</label>
+                {{ form.Email(class_="form-control") }}
+                {% for errors in form.Email.errors %}
+                    <p style="font-family:serif;color:red">
+                        {{ errors }}
+                    </p>
+                {% endfor %}
+            </div>
+            <div class="col mb-3">
+                <label for="" class="form-label">Enter Password</label>
+                {{ form.Password(class_="form-control") }}
+                {% for errors in form.Password.errors %}
+                    <p style="font-family:serif;color:red">
+                        {{ errors }}
+                    </p>
+                {% endfor %}
+            </div>
+            <div class="col mb-3">
+                <label for="" class="form-label">User Type</label>
+                {{ form.UserType(class_="form-control") }}
+                {% for errors in form.UserType.errors %}
+                    <p style="font-family:serif;color:red">
+                        {{ errors }}
+                    </p>
+                {% endfor %}
+            </div>
+            <div class="col mb-3">
+                <input type="submit" value="Login" class="btn btn-primary">
+            </div>
+        </div>
+    </form>
+    </div>
+    <div class="col-md">
+        <form action="/ren_Register" method="POST">
+            {{ form.csrf_token }}
+         <div class="container-fluid border my-5 py-3">
+            <center>
+                <h3 style="font-family: serif;">SignUp</h3>
+            </center>
+            <div class="col mb-3">
+                <label for="" class="form-label">Enter Name</label>
+                {{ form2.Name(class_="form-control") }}
+                {% for errors in form2.Name.errors %}
+                    <p style="font-family:serif;color:red">
+                        {{ errors }}
+                    </p>
+                {% endfor %}
+            </div>
+            <div class="col mb-3">
+                <label for="" class="form-label">Enter Email</label>
+                {{ form2.Email(class_="form-control") }}
+                {% for errors in form2.Email.errors %}
+                    <p style="font-family:serif;color:red">
+                        {{ errors }}
+                    </p>
+                {% endfor %}
+            </div>
+            <div class="col mb-3">
+                <label for="" class="form-label">Enter Password</label>
+                {{ form2.Password(class_="form-control") }}
+                {% for errors in form2.Password.errors %}
+                    <p style="font-family:serif;color:red">
+                        {{ errors }}
+                    </p>
+                {% endfor %}
+            </div>
+            <div class="col mb-3">
+                <input type="submit" value="Sign Up" class="btn btn-primary">
+            </div>
+        </div>
+        </form>
+    </div>
+
+</div>
+</div>
+{% endblock %}
