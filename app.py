@@ -1,11 +1,10 @@
 import os
-from re import A, S
 
 from flask import Flask, render_template, redirect, url_for, flash, session, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import FlaskForm, Form
 from wtforms import StringField, PasswordField, SelectField
-from wtforms.validators import InputRequired, length
+from wtforms.validators import Email, InputRequired, length
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from flask_admin.contrib.sqla import ModelView
 from functools import wraps
@@ -14,6 +13,7 @@ from flask_abort import abort
 try:
     from admin.admin import admins
     from agent.agent import agents
+    from customer.customer import customers
 
 except:
     pass
@@ -29,7 +29,8 @@ db = SQLAlchemy(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
 
-UserTypes = {'Agent':'Agent','Admin':'Admin'}
+UserTypes = {'Agent':'Agent','Admin':'Admin','Customer':'Customer'}
+
 
 class Users(UserMixin, db.Model):
     __tablename__ = 'Users'
@@ -60,17 +61,68 @@ class Customers(db.Model):
     Address = db.Column(db.String(255))
     Salary = db.Column(db.Integer)
     AgentID = db.Column(db.Integer)
+    Role = db.Column(db.String(255))
 
-    def __init__(self, Name, Email, Password, Address, Salary, AgentID):
+    def __init__(self, Name, Email, Password, Address, Salary, AgentID, Role):
         self.Name = Name
         self.Email = Email
         self.Password = Password
         self.Address = Address
         self.Salary = Salary
         self.AgentID = AgentID
+        self.Role = Role
+
+    def get_id(self):
+        return (self._id)
+
+    def get_role(self):
+        return (self.Role)
+
+class Loan(db.Model):
+    __tablename__ = 'Loan'
+    _id = db.Column("id", db.Integer, primary_key=True)
+    AgentID = db.Column(db.Integer)
+    AgentName = db.Column(db.String(255))
+    CustomerID = db.Column(db.Integer)
+    Name = db.Column(db.String(255))
+    Date = db.Column(db.String(255))
+    Email = db.Column(db.String(255))
+    Address = db.Column(db.String(255))
+    Salary = db.Column(db.Integer)
+    Amount = db.Column(db.Integer)
+    Interest = db.Column(db.Integer)
+    Tenure = db.Column(db.Integer)
+    Status = db.Column(db.String(255))
+    Reviewer = db.Column(db.String(255))
+    ReviewerID = db.Column(db.Integer)
+    RejectMessage = db.Column(db.String(255))
+
+    def __init__(self, AgentID, AgentName, CustomerID, Name, Date, Email, Address, Salary, Amount, Interest, Tenure, Status, Reviewer, ReviewerID, RejectMessage):
+        self.AgentID = AgentID
+        self.AgentName = AgentName
+        self.CustomerID = CustomerID 
+        self.Name = Name
+        self.Date = Date
+        self.Email = Email
+        self.Address = Address
+        self.Salary = Salary
+        self.Amount = Amount
+        self.Interest = Interest
+        self.Tenure = Tenure
+        self.Status = Status
+        self.Reviewer = Reviewer
+        self.ReviewerID = ReviewerID
+        self.RejectMessage = RejectMessage
+        
 
 @login_manager.user_loader
 def load_user(user_id):
+    # if session['Usertype'] == 'Admin':
+    #     return Users.query.filter_by(_id=user_id).first()
+    # elif session['Usertype'] == 'Agent':
+    #     return Users.query.filter_by(_id=user_id).first()
+    # elif session['Usertype'] == 'Customer':
+    #     return Customers.query.filter_by(_id=user_id).first()
     return Users.query.filter_by(_id=user_id).first()
 
 def role_required(roles):
@@ -111,16 +163,28 @@ def home():
         Password = LoginForm.Password.data
         Usertype = LoginForm.UserType.data
         if Usertype == "Admin":
+            session['Usertype'] = Usertype
             user_found = Users.query.filter_by(Email=Email,Password=Password,Role="Admin").first()
             if user_found:
                 return "Admin {} {} ".format(Email, Password)
             else:
                 flash("Check Username and Password")
         elif Usertype == "Agent":
+            session['Usertype'] = Usertype
             user_found = Users.query.filter_by(Email=Email,Password=Password,Role="Agent").first()
             if user_found:
                 login_user(user_found)
                 return redirect(url_for("agent.AgentHome"))
+            else:
+                flash("Check Username and Password")
+                return render_template("Home.html", form=LoginForm)
+        elif Usertype == "Customer":
+            print(Usertype)
+            session['Usertype'] = Usertype
+            user_found = Customers.query.filter_by(Email=Email,Password=Password,Role="Customer").first()
+            if user_found:
+                return redirect("customer/{}".format(user_found._id))
+                
             else:
                 flash("Check Username and Password")
                 return render_template("Home.html", form=LoginForm)
@@ -152,4 +216,5 @@ if __name__ == "__main__":
     db.create_all()
     app.register_blueprint(admins, url_prefix="/admin")
     app.register_blueprint(agents, url_prefix="/agent")
+    app.register_blueprint(customers, url_prefix="/customer")
     app.run(debug=True,port=3000)

@@ -1,0 +1,128 @@
+{% extends "Customerlayout.html" %}
+{% block title %}Red Carpet {% endblock %}
+
+{% block body %}
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        {% for msg in messages %}
+            <p>{{msg}}</p>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+<div class="container-fluid">
+    <table class="table table-responsive table-striped table-hover" id="myTable">
+        <thead>
+            <tr>
+                <th scope="col">Sl No</th>
+                <th scope="col">Loan No</th>
+                <th scope="col">Date</th>
+                <th scope="col">Amount</th>
+                <th scope="col">Interest</th>
+                <th scope="col">Tenure</th>
+                <th scope="col">Status</th>
+                <th scope="col">Reject Message</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for rows in data2 %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td>{{ rows._id }}</td>
+                <td>{{ rows.Date }}</td>
+                <td>{{ rows.Amount }}</td>
+                <td>{{ rows.Interest }}</td>
+                <td>{{ rows.Tenure }}</td>
+                <td>{{ rows.Status }}</td>
+                <td>{{ rows.RejectMessage }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <hr>
+    <div class="container-fluid">
+    <center>
+        <h3><strong>Calculate EMI</strong></h3>
+    </center>
+    <div class="row gx-3">
+        <div class="col-md-4 mb-4 p-5">
+            <label for="" class="form-label">Amount</label>
+            <div class="row">
+            <input type="range" class="form-range" min="20000" max="200000" step="1000" id="AmountRange" name="AmountRange">
+            <p id="AmountDisplay"></p>
+            </div>
+        </div>
+        <script>
+            var Amountslider = document.getElementById("AmountRange");
+            var AmountDisplay = document.getElementById("AmountDisplay");
+
+            AmountDisplay.innerHTML = Amountslider.value;
+
+            Amountslider.oninput = function(){
+                AmountDisplay.innerHTML = Amountslider.value;
+                calculate();
+            }
+        </script>
+        <div class="col-md-4 mb-4 p-5">
+            <label for="" class="form-label">Interest</label>
+            <div class="row">
+            <input type="range" class="form-range" min="8" max="15" step="0.2" id="InterestRange" name="InterestRange">
+            <p id="InterestDisplay"></p>   
+            </div>
+        </div>
+        <script>
+            var Interestslider = document.getElementById("InterestRange");
+            var InterestDisplay = document.getElementById("InterestDisplay");
+
+            InterestDisplay.innerHTML = Interestslider.value;
+            
+            Interestslider.oninput = function(){
+                InterestDisplay.innerHTML = Interestslider.value;
+                calculate();
+            }
+        </script>
+        <div class="col-md-4 mb-4 p-5">
+            <label for="" class="form-label">Tenure (in months)</label>
+            <div class="row">
+            <input type="range" class="form-range" min="6" max="60" step="1" id="TenureRange" name="TenureRange">
+            <p id="TenureDisplay"></p>
+            </div>
+        </div>
+        <script>
+            var Tenureslider = document.getElementById("TenureRange");
+            var TenureDisplay = document.getElementById("TenureDisplay");
+
+            TenureDisplay.innerHTML = Tenureslider.value;
+            
+            Tenureslider.oninput = function(){
+                TenureDisplay.innerHTML = Tenureslider.value;
+                calculate();
+            }
+        </script>
+        </div>
+        <center>
+            <h3>EMI = <span id="EMIvalue"></span>/-</h3>
+        </center>
+        <script>
+            function calculate(){
+                var EMI = document.getElementById("EMIvalue");
+                var P = Number(document.getElementById("AmountRange").value);
+                var R = Number(document.getElementById("InterestRange").value);
+                var N = Number(document.getElementById("TenureRange").value);
+        
+                // var calval =  (P + eval(P*R%))/N
+                //  var calval = eval((eval(P + (eval(P * (R/100)))))/N)
+                var calval = eval((P * R * Math.pow((1+R),N))/Math.pow((1+R),N-1));
+                EMI.innerHTML = calval;
+             }
+             
+        </script>
+    </div>
+</div>
+{% endblock %}
+{% block jscript %}
+<script >
+  $(document).ready( function () {
+      $('#myTable').DataTable();
+    } );
+</script> 
+{% endblock jscript %}
