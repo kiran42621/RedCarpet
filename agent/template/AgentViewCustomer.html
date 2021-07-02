@@ -10,13 +10,22 @@
     {% endif %}
 {% endwith %}
 
-    <script>calculate();</script>
-    <div class="container-fluid">
+<script>
+    window.onload = function(){
+        var BaseInterest = 12.5;
+        document.getElementById("InterestRate").value = BaseInterest;
+        calculate(Number(BaseInterest))
+    }
+</script>
+    <div class="container-fluid" onload="runThis()">
+        <form action="" method="POST">
         <div class="row">
         <div class="col-md border-end border-4 border-primary">
             <center>
                 <h3>Customer Details</h3>
             </center>
+            <input type="hidden" name="id" value="{{data._id}}">
+            <input type="text" name="" value="{{data._id}}" id="">
             <div class="col-md">
                 <label for="" class="form-label">Name</label>
                 <input type="text" name="Name" id="" value="{{data.Name}}" class="form-control">
@@ -34,7 +43,7 @@
                 <input type="text" name="Salary" id="" value="{{data.Salary}}" class="form-control">
             </div>
             <div class="col-md">
-                <input type="submit" value="Update" class="btn btn-primary">
+                <input type="submit" name="Update" value="Update" class="btn btn-primary">
                 <input type="button" value="Back" class="btn btn-Secondary">
             </div>
         </div>
@@ -42,6 +51,7 @@
             <div class="container">
             <center>
                 <h3>Calculate EMI</h3>
+                
             </center>
             <div class="col-md mb-4">
                 <label for="" class="form-label">Amount</label>
@@ -53,32 +63,52 @@
             <script>
                 var Amountslider = document.getElementById("AmountRange");
                 var AmountDisplay = document.getElementById("AmountDisplay");
+                
 
                 AmountDisplay.innerHTML = Amountslider.value;
 
                 Amountslider.oninput = function(){
+                    // var Interest = document.getElementById("InterestRate");
                     AmountDisplay.innerHTML = Amountslider.value;
-                    calculate();
-                }
-            </script>
-            <div class="col-md mb-4">
-                <label for="" class="form-label">Interest</label>
-                <div class="row">
-                <input type="range" class="form-range" min="8" max="15" step="0.2" id="InterestRange" name="InterestRange">
-                <p id="InterestDisplay"></p>   
-                </div>
-            </div>
-            <script>
-                var Interestslider = document.getElementById("InterestRange");
-                var InterestDisplay = document.getElementById("InterestDisplay");
+                    // calculate(Number(Interest.value));
 
-                InterestDisplay.innerHTML = Interestslider.value;
-                
-                Interestslider.oninput = function(){
-                    InterestDisplay.innerHTML = Interestslider.value;
-                    calculate();
+                    var Months = Number(Tenureslider.value);
+                    TenureDisplay.innerHTML = Tenureslider.value;
+                    var Interest;
+                    if (Months > 5.5 && Months < 12){
+                        Interest = 8;
+                    }
+                    else if (Months > 11.5 && Months < 18){
+                        Interest = 8.5;
+                    }
+                    else if (Months > 17.5 && Months < 24){
+                        Interest = 9;
+                    }
+                    else if (Months > 23.5 && Months < 30){
+                        Interest = 9.5;
+                    }
+                    else if (Months > 29.5 && Months < 36){
+                        Interest = 10;
+                    }
+                    else if (Months > 35.5 && Months < 42){
+                        Interest = 10.5;
+                    }
+                    else if (Months > 41.5 && Months < 48){
+                        Interest = 11;
+                    }
+                    else if (Months > 47.5 && Months < 54){
+                        Interest = 11.5;
+                    }
+                    else if (Months > 53.5 && Months <= 60){
+                        Interest = 12;
+                    }
+                    else{
+                        Interest = 12.5;
+                    }
+                    calculate(Interest);
                 }
             </script>
+            
             <div class="col-md mb-4">
                 <label for="" class="form-label">Tenure (in months)</label>
                 <div class="row">
@@ -93,30 +123,80 @@
                 TenureDisplay.innerHTML = Tenureslider.value;
                 
                 Tenureslider.oninput = function(){
+                    var Months = Number(Tenureslider.value);
                     TenureDisplay.innerHTML = Tenureslider.value;
-                    calculate();
+                    var Interest;
+                    if (Months > 5.5 && Months < 12){
+                        Interest = 8;
+                    }
+                    else if (Months > 11.5 && Months < 18){
+                        Interest = 8.5;
+                    }
+                    else if (Months > 17.5 && Months < 24){
+                        Interest = 9;
+                    }
+                    else if (Months > 23.5 && Months < 30){
+                        Interest = 9.5;
+                    }
+                    else if (Months > 29.5 && Months < 36){
+                        Interest = 10;
+                    }
+                    else if (Months > 35.5 && Months < 42){
+                        Interest = 10.5;
+                    }
+                    else if (Months > 41.5 && Months < 48){
+                        Interest = 11;
+                    }
+                    else if (Months > 47.5 && Months < 54){
+                        Interest = 11.5;
+                    }
+                    else if (Months > 53.5 && Months <= 60){
+                        Interest = 12;
+                    }
+                    else{
+                        Interest = 12.5;
+                    }
+                    calculate(Interest);
                 }
             </script>
-            <div class="col-md">
-                <h3>EMI = <span id="EMIvalue"></span>/-</h3>
+            <div class="row">
+                <div class="col">
+                    <p>Interest Rate : <span id="InterestRate" value=12.5></span>%</p>
+                </div>
+                <div class="col">
+                    <p>Total Amount Payable : <span id="AmountPayable"></span>/-</p>
+                </div>
+                <div class="col">
+                    <p>Total Interest Payable : <span id="InterestPayable"></span>/-</p>
+                </div>
             </div>
+            <center>
+                <div class="col-md">
+                    <h3>EMI = <span id="EMIvalue"></span>/-</h3>
+                    <input type="submit" name="Apply" value="Apply" class="btn btn-sm btn-success">
+                </div>
+            </center>
+            
             <!-- Calculate -->
 <script>
-    function calculate(){
+    function calculate(R){
         var EMI = document.getElementById("EMIvalue");
         var P = Number(document.getElementById("AmountRange").value);
-        var R = Number(document.getElementById("InterestRange").value);
         var N = Number(document.getElementById("TenureRange").value);
 
-        // var calval =  (P + eval(P*R%))/N
-        //  var calval = eval((eval(P + (eval(P * (R/100)))))/N)
-        var calval = eval((P * R * Math.pow((1+R),N))/Math.pow((1+R),N-1));
-        EMI.innerHTML = calval;
+        // var calval =  (P + eval(P*R%))/N;
+         var calval = (eval((eval(P + (eval(P * (R/100)))))/N));
+        // var calval = eval((P * R * Math.pow((1+R),N))/Math.pow((1+R),N-1));
+        EMI.innerHTML = Math.round(calval);
+        document.getElementById("InterestRate").innerHTML = R;
+        document.getElementById("AmountPayable").innerHTML = Math.round(calval * N);
+        document.getElementById("InterestPayable").innerHTML = Math.round((calval * N)-P);
      }
      
 </script>
         </div>
     </div>
     </div>
+    </form>
     </div>
 {% endblock %}

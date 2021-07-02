@@ -212,6 +212,12 @@ def ren_Register():
     return render_template("Register.html", form=LoginForm, form2 = RegisterForm)
 
 
+@app.route("/logout")
+def logout():
+    logout_user()
+    return redirect(url_for('home'))
+    
+
 if __name__ == "__main__":
     db.create_all()
     app.register_blueprint(admins, url_prefix="/admin")
