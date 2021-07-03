@@ -63,9 +63,6 @@ def AgentViewCustomer(id):
             Loan = app.Loan(AgentID,AgentName,ID,Name,Dates,Email,Address,Salary,Amount,Interest,Tenure,Status,'','','')
             app.db.session.add(Loan)
             app.db.session.commit()
-            # print(Interest +"_"+ Tenure +"_"+ Amount)
-            print(ID)
-            print(Interest)
             return "Button Apply"
     return render_template("AgentViewCustomer.html", data = Customer)
 
