@@ -56,10 +56,13 @@ def AgentViewCustomer(id):
             AgentID = current_user._id
             AgentName = current_user.Name
             Dates = datetime.now().strftime('%Y-%m-%d')
-            Amount = request.form.get("AmountRange")
-            Interest = request.form.get("InterestRange")
-            Tenure = request.form.get("TenureRange")
+            Amount = request.form.get("hiddenAmount")
+            Interest = request.form.get("hiddenInterest")
+            Tenure = request.form.get("hiddenTenure")
             Status = "New"
+            Loan = app.Loan(AgentID,AgentName,ID,Name,Dates,Email,Address,Salary,Amount,Interest,Tenure,Status,'','','')
+            app.db.session.add(Loan)
+            app.db.session.commit()
             # print(Interest +"_"+ Tenure +"_"+ Amount)
             print(ID)
             print(Interest)

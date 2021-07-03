@@ -6,7 +6,6 @@ from flask_wtf import FlaskForm, Form
 from wtforms import StringField, PasswordField, SelectField
 from wtforms.validators import Email, InputRequired, length
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
-from flask_admin.contrib.sqla import ModelView
 from functools import wraps
 from flask_abort import abort
 
