@@ -10,6 +10,7 @@
     {% endif %}
 {% endwith %}
     <div class="container-fluid">
+        <center><h3 style="font-family: serif;"><strong>Clients</strong></h3></center>
         <table class="table table-responsive table-hover table-striped" id="myTable">
             <thead>
                 <tr>
@@ -31,12 +32,46 @@
             </tbody>
         </table>
     </div>
+    <div class="container-fluid">
+        <center><h3 style="font-family: serif;"><strong>Loans</strong></h3></center>
+        <table class="table table-responsive table-hover table-striped" id="loanTable">
+            <thead>
+                <tr>
+                    <th scope="col">Loan Number</th>
+                    <th scope="col">Customer Name</th>
+                    <th scope="col">Date</th>
+                    <th scope="col">Salary</th>
+                    <th scope="col">Loan Amount</th>
+                    <th scope="col">Interest</th>
+                    <th scope="col">Tenure</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Reject Message</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for rows in data2 %}
+                <tr>
+                    <td><a href="/agent/AgentViewLoan/{{rows._id}}">{{ rows._id }}</a></td>
+                    <td>{{ rows.Name }}</td>
+                    <td>{{ rows.Date }}</td>
+                    <td>{{ rows.Salary }}</td>
+                    <td>{{ rows.Amount[rows.Amount | length - 1] }}</td>
+                    <td>{{ rows.Interest[rows.Interest | length - 1] }}</td>
+                    <td>{{ rows.Tenure[rows.Tenure | length - 1] }}</td>
+                    <td>{{ rows.Status }}</td>
+                    <td>{{ rows.RejectMessage }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 {% endblock %}
 
 {% block jscript %}
 <script >
   $(document).ready( function () {
       $('#myTable').DataTable();
+      $('#loanTable').DataTable();
     } );
 </script> 
 {% endblock jscript %}

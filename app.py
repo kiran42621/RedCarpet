@@ -88,13 +88,13 @@ class Loan(db.Model):
     Email = db.Column(db.String(255))
     Address = db.Column(db.String(255))
     Salary = db.Column(db.Integer)
-    Amount = db.Column(db.Integer)
-    Interest = db.Column(db.Integer)
-    Tenure = db.Column(db.Integer)
+    Amount = db.Column(db.JSON)
+    Interest = db.Column(db.JSON)
+    Tenure = db.Column(db.JSON)
     Status = db.Column(db.String(255))
     Reviewer = db.Column(db.String(255))
     ReviewerID = db.Column(db.Integer)
-    RejectMessage = db.Column(db.String(255))
+    RejectMessage = db.Column(db.JSON)
 
     def __init__(self, AgentID, AgentName, CustomerID, Name, Date, Email, Address, Salary, Amount, Interest, Tenure, Status, Reviewer, ReviewerID, RejectMessage):
         self.AgentID = AgentID
@@ -165,7 +165,8 @@ def home():
             session['Usertype'] = Usertype
             user_found = Users.query.filter_by(Email=Email,Password=Password,Role="Admin").first()
             if user_found:
-                return "Admin {} {} ".format(Email, Password)
+                login_user(user_found)
+                return redirect(url_for("admin.AdminHome"))
             else:
                 flash("Check Username and Password")
         elif Usertype == "Agent":

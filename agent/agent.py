@@ -2,11 +2,13 @@ from datetime import datetime
 from flask import Blueprint, render_template, request
 from flask.helpers import flash, url_for
 from flask_wtf import FlaskForm, Form
+from sqlalchemy.sql.expression import update
 from werkzeug.utils import redirect
 from wtforms import StringField, PasswordField, SelectField, form
 from wtforms.fields.core import IntegerField
 from wtforms.validators import Email, InputRequired, length
 from flask_login import current_user
+from sqlalchemy import insert
 
 import app as app
 
@@ -21,8 +23,14 @@ class AddCustomer(Form):
 
 @agents.route("/AgentHome")
 def AgentHome():
-    Customer = app.Customers.query.filter_by(AgentID = current_user._id).all()
-    return render_template("AgentHome.html", data=Customer)
+    try:
+        Customer = app.Customers.query.filter_by(AgentID = current_user._id).all()
+        Loan = app.Loan.query.filter_by(AgentID = current_user._id).all()
+    except:
+        pass
+    print(type(Loan[0].Amount))
+    print(Loan[0].Amount)
+    return render_template("AgentHome.html", data=Customer, data2=Loan)
 
 @agents.route("/AgentViewCustomer/<id>", methods=['POST','GET'])
 def AgentViewCustomer(id):
@@ -56,15 +64,39 @@ def AgentViewCustomer(id):
             AgentID = current_user._id
             AgentName = current_user.Name
             Dates = datetime.now().strftime('%Y-%m-%d')
-            Amount = request.form.get("hiddenAmount")
-            Interest = request.form.get("hiddenInterest")
-            Tenure = request.form.get("hiddenTenure")
+            Amount = []
+            Amount.append(request.form.get("hiddenAmount"))
+            Interest = []
+            Interest.append(request.form.get("hiddenInterest"))
+            Tenure = []
+            Tenure.append(request.form.get("hiddenTenure"))
             Status = "New"
             Loan = app.Loan(AgentID,AgentName,ID,Name,Dates,Email,Address,Salary,Amount,Interest,Tenure,Status,'','','')
             app.db.session.add(Loan)
             app.db.session.commit()
             return "Button Apply"
     return render_template("AgentViewCustomer.html", data = Customer)
+
+@agents.route("/AgentViewLoan/<id>", methods=['POST','GET'])
+def AgentViewLoan(id):
+    Loan = app.Loan.query.filter_by(_id = id).first()
+    if request.method == 'POST':
+        ID = request.form.get("id")
+        Interest = request.form.get("hiddenInterest")
+        Amount = request.form.get("hiddenAmount")
+        Tenure = request.form.get("hiddenTenure")
+        Sel_Loan = app.Loan.query.filter_by(_id = ID).first()
+        # Sel_Loan.Amount= Sel_Loan.Amount.append(Amount)
+        Amt = Sel_Loan.Amount
+        Inte = Sel_Loan.Interest
+        Ten = Sel_Loan.Tenure
+        Amt.append(Amount)
+        Inte.append(Interest)
+        Ten.append(Tenure)
+        update_info = app.Loan.query.filter_by(_id = ID).update(dict(Amount=Amt,Interest=Inte,Tenure=Ten))
+        app.db.session.commit()
+        return redirect(url_for("agent.AgentViewLoan",id = ID))
+    return render_template("AgentViewLoan.html", data = Loan)
 
 @agents.route("/AgentAddCustomer", methods=['POST','GET'])
 def AgentAddCustomer():

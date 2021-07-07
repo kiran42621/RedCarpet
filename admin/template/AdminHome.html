@@ -1,0 +1,60 @@
+{% extends "adminlayout.html" %}
+{% block title %}Red Carpet {% endblock %}
+
+{% block body %}
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        {% for msg in messages %}
+            <p>{{msg}}</p>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+
+<div class="container-fluid">
+    <center><h3 style="font-family:serif, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;"><strong>Loans</strong></h3></center>
+    <table class="table table-responsive table-hover table-striped" id="myTable">
+        <thead>
+            <tr>
+                <th>Slno.</th>
+                <th>Loan No.</th>
+                <th>Customer Name</th>
+                <th>Date</th>
+                <th>Salary</th>
+                <th>Amount</th>
+                <th>Tenure</th>
+                <th>Interest</th>
+                <th>Status</th>
+                <th>Agent ID</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <form method="POST">
+            <tr>
+                <td>1</td>
+                <td>1</td>
+                <td>kiran</td>
+                <td>25/25/2020</td>
+                <td>95000</td>
+                <td>110000</td>
+                <td>24</td>
+                <td>10.5</td>
+                <td>NEW</td>
+                <td>1</td>
+                <td><input type="submit" name="Approved" value="Approve" class="btn btn-sm btn-outline-primary mx-0"> <input type="submit" name="Reject" value="Rejected" class="btn btn-sm btn-outline-danger"></td>
+            </tr>
+            </form>
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}
+
+{% block jscript %}
+<script >
+    $(document).ready( function () {
+        $('#myTable').DataTable();
+        $('#loanTable').DataTable();
+      } );
+  </script> 
+{% endblock jscript %}
