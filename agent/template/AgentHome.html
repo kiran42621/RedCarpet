@@ -9,7 +9,7 @@
         {% endfor %}
     {% endif %}
 {% endwith %}
-    <div class="container-fluid">
+    <div class="container-fluid border mb-4 py-3">
         <center><h3 style="font-family: serif;"><strong>Clients</strong></h3></center>
         <table class="table table-responsive table-hover table-striped" id="myTable">
             <thead>
@@ -32,7 +32,7 @@
             </tbody>
         </table>
     </div>
-    <div class="container-fluid">
+    <div class="container-fluid border mb-4 py-3">
         <center><h3 style="font-family: serif;"><strong>Loans</strong></h3></center>
         <table class="table table-responsive table-hover table-striped" id="loanTable">
             <thead>
@@ -50,6 +50,7 @@
             </thead>
             <tbody>
                 {% for rows in data2 %}
+                {% if rows.Status != "Approved" %}
                 <tr>
                     <td><a href="/agent/AgentViewLoan/{{rows._id}}">{{ rows._id }}</a></td>
                     <td>{{ rows.Name }}</td>
@@ -61,6 +62,43 @@
                     <td>{{ rows.Status }}</td>
                     <td>{{ rows.RejectMessage }}</td>
                 </tr>
+                {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    <div class="container-fluid border mb-4 py-3">
+        <center><h3 style="font-family: serif;"><strong>Approved Loans</strong></h3></center>
+        <table class="table table-responsive table-hover table-striped" id="approveTable">
+            <thead>
+                <tr>
+                    <th scope="col">Loan Number</th>
+                    <th scope="col">Customer Name</th>
+                    <th scope="col">Date</th>
+                    <th scope="col">Salary</th>
+                    <th scope="col">Loan Amount</th>
+                    <th scope="col">Interest</th>
+                    <th scope="col">Tenure</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Reject Message</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for rows in data2 %}
+                {% if rows.Status == "Approved" %}
+                <tr>
+                    <td>{{ rows._id }}</td>
+                    <td>{{ rows.Name }}</td>
+                    <td>{{ rows.Date }}</td>
+                    <td>{{ rows.Salary }}</td>
+                    <td>{{ rows.Amount }}</td>
+                    <td>{{ rows.Interest }}</td>
+                    <td>{{ rows.Tenure }}</td>
+                    <td>{{ rows.Status }}</td>
+                    <td>{{ rows.RejectMessage }}</td>
+                </tr>
+                {% endif %}
                 {% endfor %}
             </tbody>
         </table>
@@ -72,6 +110,7 @@
   $(document).ready( function () {
       $('#myTable').DataTable();
       $('#loanTable').DataTable();
+      $('#approveTable').DataTable();
     } );
 </script> 
 {% endblock jscript %}

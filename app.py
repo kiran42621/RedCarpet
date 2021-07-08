@@ -51,7 +51,7 @@ class Users(UserMixin, db.Model):
     def get_role(self):
         return (self.Role)
 
-class Customers(db.Model):
+class Customers(UserMixin, db.Model):
     __tablename__ = 'Customers'
     _id = db.Column("id", db.Integer, primary_key=True)
     Name = db.Column(db.String(255))
@@ -116,12 +116,12 @@ class Loan(db.Model):
 
 @login_manager.user_loader
 def load_user(user_id):
-    # if session['Usertype'] == 'Admin':
-    #     return Users.query.filter_by(_id=user_id).first()
-    # elif session['Usertype'] == 'Agent':
-    #     return Users.query.filter_by(_id=user_id).first()
-    # elif session['Usertype'] == 'Customer':
-    #     return Customers.query.filter_by(_id=user_id).first()
+    if session['Usertype'] == 'Admin':
+        return Users.query.filter_by(_id=user_id).first()
+    elif session['Usertype'] == 'Agent':
+        return Users.query.filter_by(_id=user_id).first()
+    elif session['Usertype'] == 'Customer':
+        return Customers.query.filter_by(_id=user_id).first()
     return Users.query.filter_by(_id=user_id).first()
 
 def role_required(roles):
@@ -131,17 +131,16 @@ def role_required(roles):
 
             if current_user:
 
-                if not current_user.RoleID in roles:
-                    print("Working in wraps")
+                if not current_user.Role in roles:
                     flash("You do not have permission to access this page", "warning")
                     abort(404, "You don't have permission to access this page ")
                 return f(*args, **kwargs)
             else:
-                print("Working in wraps")
                 flash("You do not have permission to access this page", "warning")
                 abort(404)
         return roles_required
     return decorator
+
 
 class Login(Form):
     Email = StringField('Email', validators=[InputRequired(message='Required'), length(min=3, max=30, message="Name should be below 30 Characters")])
@@ -156,6 +155,7 @@ class Register(Form):
     
 @app.route("/", methods=['POST', 'GET'])
 def home():
+    logout_user()
     LoginForm = Login()
     if request.method == 'POST':
         Email = LoginForm.Email.data
@@ -183,6 +183,8 @@ def home():
             session['Usertype'] = Usertype
             user_found = Customers.query.filter_by(Email=Email,Password=Password,Role="Customer").first()
             if user_found:
+                login_user(user_found)
+                print(current_user._id)
                 return redirect("customer/{}".format(user_found._id))
                 
             else:

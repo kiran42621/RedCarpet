@@ -1,6 +1,7 @@
 from datetime import datetime
-from flask import Blueprint, render_template, request
+from flask import Blueprint, render_template, request, flash
 from flask.helpers import flash, url_for
+from flask_login.utils import login_required
 from flask_wtf import FlaskForm, Form
 from sqlalchemy.sql.expression import update
 from werkzeug.utils import redirect
@@ -22,6 +23,8 @@ class AddCustomer(Form):
     Salary = IntegerField('Salary', validators=[InputRequired(message='Required')])
 
 @agents.route("/AgentHome")
+@login_required
+@app.role_required("Agent")
 def AgentHome():
     try:
         Customer = app.Customers.query.filter_by(AgentID = current_user._id).all()
@@ -33,6 +36,8 @@ def AgentHome():
     return render_template("AgentHome.html", data=Customer, data2=Loan)
 
 @agents.route("/AgentViewCustomer/<id>", methods=['POST','GET'])
+@login_required
+@app.role_required("Agent")
 def AgentViewCustomer(id):
     Customer = app.Customers.query.filter_by(_id = id).first()
     if request.method == 'POST':
@@ -71,15 +76,22 @@ def AgentViewCustomer(id):
             Tenure = []
             Tenure.append(request.form.get("hiddenTenure"))
             Status = "New"
-            Loan = app.Loan(AgentID,AgentName,ID,Name,Dates,Email,Address,Salary,Amount,Interest,Tenure,Status,'','','')
+            RejectMsg = []
+            RejectMsg.append("")
+            Loan = app.Loan(AgentID,AgentName,ID,Name,Dates,Email,Address,Salary,Amount,Interest,Tenure,Status,'','',RejectMsg)
             app.db.session.add(Loan)
             app.db.session.commit()
             return "Button Apply"
     return render_template("AgentViewCustomer.html", data = Customer)
 
 @agents.route("/AgentViewLoan/<id>", methods=['POST','GET'])
+@login_required
+@app.role_required("Agent")
 def AgentViewLoan(id):
     Loan = app.Loan.query.filter_by(_id = id).first()
+    if Loan.Status == "Approved":
+        flash("Loan Already Approved cannot modify")
+        return redirect(url_for("agent.AgentHome"))
     if request.method == 'POST':
         ID = request.form.get("id")
         Interest = request.form.get("hiddenInterest")
@@ -99,6 +111,8 @@ def AgentViewLoan(id):
     return render_template("AgentViewLoan.html", data = Loan)
 
 @agents.route("/AgentAddCustomer", methods=['POST','GET'])
+@login_required
+@app.role_required("Agent")
 def AgentAddCustomer():
     CustomerAddForm = AddCustomer()
     if request.method == 'POST':
@@ -113,7 +127,7 @@ def AgentAddCustomer():
             flash("Email already exist try another")
             return render_template("AgentAddCustomer.html", form = CustomerAddForm)
         else:
-            data = app.Customers(Name,Email,Password,Address,Salary,AgentID)
+            data = app.Customers(Name,Email,Password,Address,Salary,AgentID,'Customer')
             app.db.session.add(data)
             app.db.session.commit()
             flash("User Added")
