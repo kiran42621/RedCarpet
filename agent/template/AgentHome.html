@@ -60,7 +60,7 @@
                     <td>{{ rows.Interest[rows.Interest | length - 1] }}</td>
                     <td>{{ rows.Tenure[rows.Tenure | length - 1] }}</td>
                     <td>{{ rows.Status }}</td>
-                    <td>{{ rows.RejectMessage }}</td>
+                    <td>{{ rows.RejectMessage[rows.RejectMessage | length - 1] }}</td>
                 </tr>
                 {% endif %}
                 {% endfor %}

@@ -194,29 +194,46 @@ def home():
 
 @app.route("/ren_Register", methods=['POST','GET'])
 def ren_Register():
-    LoginForm = Login()
-    RegisterForm = Register()
+    if session['Admin'] == "Admin":
+        LoginForm = Login()
+        RegisterForm = Register()
+        if request.method == 'POST':
+            Name = RegisterForm.Name.data
+            Email = RegisterForm.Email.data
+            Password = RegisterForm.Password.data
+            Usertype = RegisterForm.UserType.data
+            user_found = Users.query.filter_by(Email=Email,Password=Password,Role="Admin").first()
+            if user_found:
+                flash("User Already Exist")
+                return redirect(url_for("home"))
+            else:
+                data = Users(Name, Email, Password, 'Admin')
+                db.session.add(data)
+                db.session.commit()
+                flash("User Registered")
+                return redirect(url_for("home"))
+        return render_template("Register.html", form=LoginForm, form2 = RegisterForm)
+    else:
+        flash("Something went wrong!")
+        return redirect(url_for("home"))
+
+@app.route("/default_login", methods=['GET','POST'])
+def default_login():
     if request.method == 'POST':
-        Name = RegisterForm.Name.data
-        Email = RegisterForm.Email.data
-        Password = RegisterForm.Password.data
-        Usertype = RegisterForm.UserType.data
-        user_found = Users.query.filter_by(Email=Email,Password=Password,Role="Admin").first()
-        if user_found:
-            flash("User Already Exist")
-            return redirect(url_for("home"))
+        if (request.form.get("def_id") == "Admin") & (request.form.get("def_password") == "Admin@123#"):
+            session['Admin'] = "Admin"
+            return redirect(url_for("ren_Register"))
         else:
-            data = Users(Name, Email, Password, 'Agent')
-            db.session.add(data)
-            db.session.commit()
-            flash("User Registered")
+            flash("Only Admin can login in that page")
             return redirect(url_for("home"))
-    return render_template("Register.html", form=LoginForm, form2 = RegisterForm)
+    return render_template("DefaultLogin.html")
 
 
 @app.route("/logout")
 def logout():
     logout_user()
+    for key in list(session.keys()):
+        session.pop(key)
     return redirect(url_for('home'))
     
 

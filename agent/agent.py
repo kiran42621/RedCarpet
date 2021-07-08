@@ -31,8 +31,6 @@ def AgentHome():
         Loan = app.Loan.query.filter_by(AgentID = current_user._id).all()
     except:
         pass
-    print(type(Loan[0].Amount))
-    print(Loan[0].Amount)
     return render_template("AgentHome.html", data=Customer, data2=Loan)
 
 @agents.route("/AgentViewCustomer/<id>", methods=['POST','GET'])
@@ -81,7 +79,8 @@ def AgentViewCustomer(id):
             Loan = app.Loan(AgentID,AgentName,ID,Name,Dates,Email,Address,Salary,Amount,Interest,Tenure,Status,'','',RejectMsg)
             app.db.session.add(Loan)
             app.db.session.commit()
-            return "Button Apply"
+            flash("Loan Requested")
+            return render_template("AgentViewCustomer.html", data = Customer)
     return render_template("AgentViewCustomer.html", data = Customer)
 
 @agents.route("/AgentViewLoan/<id>", methods=['POST','GET'])

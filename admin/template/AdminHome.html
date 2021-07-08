@@ -45,7 +45,7 @@
                 <td>{{ rows.Status }}</td>
                 <td>{{ rows.CustomerID }}</td>
                 <td><input type="submit" name="Approved" value="Approve" class="btn btn-sm btn-outline-primary mx-0">
-                 <button type="button" name="Reject" class="btn btn-sm btn-outline-danger" value="3" data-bs-toggle="modal" data-bs-target="#exampleModal" id="Reject">Reject</button></td>
+                 <button type="button" name="Reject" class="btn btn-sm btn-outline-danger" value="{{ rows._id }}" data-bs-toggle="modal" data-bs-target="#exampleModal" id="Reject">Reject</button></td>
             </form>
             </tr>
             {% endif %}

@@ -1,0 +1,32 @@
+{% extends "baselayout.html" %}
+{% block title %}Red Carpet {% endblock %}
+
+{% block body %}
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        {% for msg in messages %}
+            <p>{{msg}}</p>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+    <div class="container my-3 py-3 border">
+        <form action="" method="POST">
+        <center><h3>Login</h3>
+        <div class="col-md-4 mb-3">
+            <label for="" class="form-label">Enter ID :</label>
+            <input type="text" name="def_id" id="" class="form-control">
+        </div>
+        <div class="col-md-4 mb-3">
+            <label for="" class="form-label">Enter Password :</label>
+            <input type="password" name="def_password" id="" class="form-control">
+        </div>
+        <div class="col-md mb-3">
+            <input type="submit" value="Login" class="btn-sm btn-primary">
+        </div>
+        <div class="col-md mb-3">
+            <a href="/">Back to Home</a>
+        </div>
+    </center>
+    </form>
+    </div>
+{% endblock %}
