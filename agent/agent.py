@@ -11,6 +11,7 @@ from wtforms import StringField, PasswordField, SelectField, form
 from wtforms.fields.core import IntegerField
 from wtforms.validators import Email, InputRequired, length
 from flask_login import current_user
+from werkzeug.security import generate_password_hash
 from sqlalchemy import insert
 
 import app as app
@@ -78,7 +79,7 @@ def AgentViewCustomer(id):
             Status = "New"
             RejectMsg = []
             RejectMsg.append("")
-            Loan = app.Loan(AgentID,AgentName,ID,Name,Dates,Email,Address,Salary,Amount,Interest,Tenure,Status,'','',RejectMsg)
+            Loan = app.Loan(AgentID,AgentName,ID,Name,Dates,Email,Address,Salary,Amount,Interest,Tenure,Status,'',0,RejectMsg)
             app.db.session.add(Loan)
             app.db.session.commit()
             flash("Loan Requested")
@@ -106,7 +107,7 @@ def AgentViewLoan(id):
         Amt.append(Amount)
         Inte.append(Interest)
         Ten.append(Tenure)
-        update_info = app.Loan.query.filter_by(_id = ID).update(dict(Amount=Amt,Interest=Inte,Tenure=Ten))
+        update_info = app.Loan.query.filter_by(_id = ID).update(dict(Amount=Amt,Interest=Inte,Tenure=Ten,Status="Modified"))
         app.db.session.commit()
         return redirect(url_for("agent.AgentViewLoan",id = ID))
     return render_template("AgentViewLoan.html", data = Loan)
@@ -119,7 +120,7 @@ def AgentAddCustomer():
     if request.method == 'POST':
         Name = CustomerAddForm.Name.data
         Email = CustomerAddForm.Email.data
-        Password = app.bcrypt.generate_password_hash(CustomerAddForm.Password.data)
+        Password = generate_password_hash(CustomerAddForm.Password.data)
         Address = CustomerAddForm.Address.data
         Salary = CustomerAddForm.Salary.data
         AgentID = current_user._id

@@ -4,6 +4,7 @@ from flask_login.utils import login_required
 from wtforms import StringField, PasswordField
 from flask_wtf import Form
 from wtforms.validators import Email, InputRequired, length
+from werkzeug.security import generate_password_hash
 from flask_bcrypt import Bcrypt
 
 import app as app
@@ -51,7 +52,7 @@ def AdminAddAgent():
     if request.method == 'POST':
         Name = AgentAddForm.Name.data
         Email = AgentAddForm.Email.data
-        Password = app.bcrypt.generate_password_hash(AgentAddForm.Password.data)
+        Password = generate_password_hash(AgentAddForm.Password.data)
         user_found = app.Users.query.filter_by(Email = Email).first()
         if user_found:
             flash("Email already exist try another")

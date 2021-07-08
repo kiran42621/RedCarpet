@@ -1,4 +1,5 @@
 import os
+import bcrypt
 
 from flask import Flask, render_template, redirect, url_for, flash, session, request
 from flask_sqlalchemy import SQLAlchemy
@@ -8,7 +9,10 @@ from wtforms.validators import Email, InputRequired, length
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from functools import wraps
 from flask_abort import abort
-from flask_bcrypt import Bcrypt
+from werkzeug.security import generate_password_hash, check_password_hash
+# from flask_bcrypt import Bcrypt
+
+import psycopg2
 
 try:
     from admin.admin import admins
@@ -21,14 +25,14 @@ except:
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'RedCarpet.sqlite3')
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:1234@localhost/RedCarpet'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.secret_key = "Kcube"
 
 db = SQLAlchemy(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
-bcrypt = Bcrypt(app)
+# bcrypt = Bcrypt(app)
 
 UserTypes = {'Agent':'Agent','Admin':'Admin','Customer':'Customer'}
 
@@ -167,7 +171,7 @@ def home():
             session['Usertype'] = Usertype
             user_found = Users.query.filter_by(Email=Email,Role="Admin").first()
             if user_found:
-                if bcrypt.check_password_hash(user_found.Password,Password):
+                if check_password_hash(user_found.Password, Password):
                     login_user(user_found)
                     return redirect(url_for("admin.AdminHome"))
                 else:
@@ -178,7 +182,7 @@ def home():
             session['Usertype'] = Usertype
             user_found = Users.query.filter_by(Email=Email,Role="Agent").first()
             if user_found:
-                if bcrypt.check_password_hash(user_found.Password,Password):
+                if check_password_hash(user_found.Password, Password):
                     login_user(user_found)
                     return redirect(url_for("agent.AgentHome"))
                 else:
@@ -191,7 +195,7 @@ def home():
             session['Usertype'] = Usertype
             user_found = Customers.query.filter_by(Email=Email,Role="Customer").first()
             if user_found:
-                if bcrypt.check_password_hash(user_found.Password,Password):
+                if check_password_hash(user_found.Password, Password):
                     login_user(user_found)
                     return redirect("customer/{}".format(user_found._id))
                 else:
@@ -209,14 +213,16 @@ def ren_Register():
         if request.method == 'POST':
             Name = RegisterForm.Name.data
             Email = RegisterForm.Email.data
-            Password = bcrypt.generate_password_hash(RegisterForm.Password.data)
+            Password = RegisterForm.Password.data
+            hash = Password.encode('utf-8')
+            hashed_pw = generate_password_hash(Password)
             Usertype = RegisterForm.UserType.data
-            user_found = Users.query.filter_by(Email=Email,Password=Password,Role="Admin").first()
+            user_found = Users.query.filter_by(Email=Email,Role="Admin").first()
             if user_found:
                 flash("User Already Exist")
                 return redirect(url_for("home"))
             else:
-                data = Users(Name, Email, Password, 'Admin')
+                data = Users(Name, Email, hashed_pw, 'Admin')
                 db.session.add(data)
                 db.session.commit()
                 flash("User Registered")
