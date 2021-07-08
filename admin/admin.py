@@ -1,10 +1,20 @@
-from flask import Blueprint, render_template, redirect, request, url_for
+from flask import Blueprint, render_template, redirect, request, url_for, flash
 from flask_login import current_user
 from flask_login.utils import login_required
+from wtforms import StringField, PasswordField
+from flask_wtf import Form
+from wtforms.validators import Email, InputRequired, length
+from flask_bcrypt import Bcrypt
 
 import app as app
+import bcrypt
 
 admins = Blueprint('admin',__name__,template_folder="template",static_folder="static")
+
+class AddAgent(Form):
+    Name = StringField('Name', validators=[InputRequired(message='Required'), length(min=3, max=30, message="Name should be below 30 Characters")])
+    Email = StringField('Email', validators=[InputRequired(message='Required'), length(min=3, max=30, message="Name should be below 30 Characters")])
+    Password = PasswordField('Password', validators=[InputRequired(message='Required')])
 
 @admins.route("/", methods=['POST','GET'])
 @login_required
@@ -32,3 +42,24 @@ def AdminHome():
         else:
             return "error"
     return render_template("AdminHome.html", data = Loans)
+
+@admins.route("/AddAgent", methods=['POST','GET'])
+@login_required
+@app.role_required("Admin")
+def AdminAddAgent():
+    AgentAddForm = AddAgent()
+    if request.method == 'POST':
+        Name = AgentAddForm.Name.data
+        Email = AgentAddForm.Email.data
+        Password = app.bcrypt.generate_password_hash(AgentAddForm.Password.data)
+        user_found = app.Users.query.filter_by(Email = Email).first()
+        if user_found:
+            flash("Email already exist try another")
+            return render_template("AdminAddAgent.html", form = AgentAddForm)
+        else:
+            data = app.Users(Name,Email,Password,'Agent')
+            app.db.session.add(data)
+            app.db.session.commit()
+            flash("User Added")
+            return render_template("AdminAddAgent.html", form = AgentAddForm)
+    return render_template("AdminAddAgent.html", form = AgentAddForm)

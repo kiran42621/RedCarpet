@@ -8,6 +8,7 @@ from wtforms.validators import Email, InputRequired, length
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from functools import wraps
 from flask_abort import abort
+from flask_bcrypt import Bcrypt
 
 try:
     from admin.admin import admins
@@ -27,6 +28,7 @@ app.secret_key = "Kcube"
 db = SQLAlchemy(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
+bcrypt = Bcrypt(app)
 
 UserTypes = {'Agent':'Agent','Admin':'Admin','Customer':'Customer'}
 
@@ -159,36 +161,43 @@ def home():
     LoginForm = Login()
     if request.method == 'POST':
         Email = LoginForm.Email.data
-        Password = LoginForm.Password.data
+        Password =LoginForm.Password.data
         Usertype = LoginForm.UserType.data
         if Usertype == "Admin":
             session['Usertype'] = Usertype
-            user_found = Users.query.filter_by(Email=Email,Password=Password,Role="Admin").first()
+            user_found = Users.query.filter_by(Email=Email,Role="Admin").first()
             if user_found:
-                login_user(user_found)
-                return redirect(url_for("admin.AdminHome"))
+                if bcrypt.check_password_hash(user_found.Password,Password):
+                    login_user(user_found)
+                    return redirect(url_for("admin.AdminHome"))
+                else:
+                    flash("Check Password and Try Again")
             else:
-                flash("Check Username and Password")
+                flash("Check Username and Try Again")
         elif Usertype == "Agent":
             session['Usertype'] = Usertype
-            user_found = Users.query.filter_by(Email=Email,Password=Password,Role="Agent").first()
+            user_found = Users.query.filter_by(Email=Email,Role="Agent").first()
             if user_found:
-                login_user(user_found)
-                return redirect(url_for("agent.AgentHome"))
+                if bcrypt.check_password_hash(user_found.Password,Password):
+                    login_user(user_found)
+                    return redirect(url_for("agent.AgentHome"))
+                else:
+                    flash("Check Password and Try Again")
             else:
-                flash("Check Username and Password")
+                flash("Check Username and Try Again")
                 return render_template("Home.html", form=LoginForm)
         elif Usertype == "Customer":
             print(Usertype)
             session['Usertype'] = Usertype
-            user_found = Customers.query.filter_by(Email=Email,Password=Password,Role="Customer").first()
+            user_found = Customers.query.filter_by(Email=Email,Role="Customer").first()
             if user_found:
-                login_user(user_found)
-                print(current_user._id)
-                return redirect("customer/{}".format(user_found._id))
-                
+                if bcrypt.check_password_hash(user_found.Password,Password):
+                    login_user(user_found)
+                    return redirect("customer/{}".format(user_found._id))
+                else:
+                    flash("Check Password and Try Again")
             else:
-                flash("Check Username and Password")
+                flash("Check Username and Try Again")
                 return render_template("Home.html", form=LoginForm)
     return render_template("Home.html", form=LoginForm)
 
@@ -200,7 +209,7 @@ def ren_Register():
         if request.method == 'POST':
             Name = RegisterForm.Name.data
             Email = RegisterForm.Email.data
-            Password = RegisterForm.Password.data
+            Password = bcrypt.generate_password_hash(RegisterForm.Password.data)
             Usertype = RegisterForm.UserType.data
             user_found = Users.query.filter_by(Email=Email,Password=Password,Role="Admin").first()
             if user_found:

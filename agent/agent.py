@@ -1,3 +1,5 @@
+import bcrypt
+
 from datetime import datetime
 from flask import Blueprint, render_template, request, flash
 from flask.helpers import flash, url_for
@@ -117,7 +119,7 @@ def AgentAddCustomer():
     if request.method == 'POST':
         Name = CustomerAddForm.Name.data
         Email = CustomerAddForm.Email.data
-        Password = CustomerAddForm.Password.data
+        Password = app.bcrypt.generate_password_hash(CustomerAddForm.Password.data)
         Address = CustomerAddForm.Address.data
         Salary = CustomerAddForm.Salary.data
         AgentID = current_user._id

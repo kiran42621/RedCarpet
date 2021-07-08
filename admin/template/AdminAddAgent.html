@@ -1,0 +1,51 @@
+{% extends "adminlayout.html" %}
+{% block title %}Red Carpet {% endblock %}
+
+{% block body %}
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        {% for msg in messages %}
+            <p>{{msg}}</p>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+<form action="" method="POST">
+    {{ form.csrf_token }}
+    <div class="container p-5 m-5 border">
+        <center>
+            <h3 style="font-family:serif">Add Agent</h3>
+        </center>
+        <div class="col-md mb-3">
+            <label for="" class="form-label">Name</label>
+            {{ form.Name(class_="form-control") }}
+                {% for errors in form.Name.errors %}
+                    <p style="font-family:serif;color:red">
+                        {{ errors }}
+                    </p>
+                {% endfor %}
+        </div>
+        <div class="col-md mb-3">
+            <label for="" class="form-label">Email</label>
+            {{ form.Email(class_="form-control") }}
+                {% for errors in form.Email.errors %}
+                    <p style="font-family:serif;color:red">
+                        {{ errors }}
+                    </p>
+                {% endfor %}
+        </div>
+        <div class="col-md mb-3">
+            <label for="" class="form-label">Password</label>
+            {{ form.Password(class_="form-control") }}
+                {% for errors in form.Password.errors %}
+                    <p style="font-family:serif;color:red">
+                        {{ errors }}
+                    </p>
+                {% endfor %}
+        </div>
+        
+        <div class="col mb-3">
+            <input type="submit" value="Add" class="btn btn-sm btn-primary">
+        </div>
+    </div>
+</form>
+{% endblock %}
